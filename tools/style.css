@@ -1,0 +1,7 @@
+#ui{position:fixed;left:0;right:0;top:36%;bottom:0;z-index:10;display:none;overflow:auto;touch-action:pan-y;font:600 15px system-ui;color:#fff;text-align:center;padding:0 10px 10px;box-sizing:border-box}
+#ui .card{max-width:420px;margin:0 auto;padding:14px 16px;background:#120a24ee;border:1px solid #fff3;border-radius:14px}
+#ui h3{margin:0 0 8px;color:#ffd60a}#ui p{margin:6px 0}
+#ui button{display:block;width:100%;margin:7px 0;padding:11px;border-radius:10px;border:0;background:#ffd60a;color:#120a24;font:800 15px system-ui}
+#ui input{width:100%;box-sizing:border-box;margin:6px 0;padding:10px;border-radius:8px;border:1px solid #fff5;background:#0008;color:#fff;font:600 16px system-ui;text-align:center;user-select:text;-webkit-user-select:text}
+#ui ol,#ui ul{text-align:left;margin:6px 0;padding-left:26px}#ui li.me{color:#4ade80}
+.code{letter-spacing:4px;font-size:24px}.err{color:#f87171}.hint{opacity:.7;font-size:12px}
