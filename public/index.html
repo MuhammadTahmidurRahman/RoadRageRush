@@ -184,7 +184,7 @@ function upd(dt){
  const bst=(k.ShiftLeft||k.ShiftRight||k.KeyN||k.Nit)&&nit>2&&!br;nit=bst?nit-(34-UP.n*3)*dt:Math.min(100,nit+(9+UP.n*2)*dt);
  if(bst){sp+=150*dt;if(R()<.8)pts.push({x:W/2+(R()-.5)*14,y:hy+(H-hy)*.76,vx:(R()-.5)*60,vy:70,l:.3,c:R()<.5?'#ff9a2e':'#fff1a8'})}
  sp+=(br?-230:(off?(sp>150?-90:60):85))*dt;sp=Math.max(0,Math.min((bst?340:270)+UP.s*9,sp));
- px+=(Rt-Lf)*dt*(.55+sp/190);px-=curve(pz)*sp/270*dt*.18;if(Math.abs(px)>1.05)px-=Math.sign(px)*dt*.7;px=Math.max(-1.3,Math.min(1.3,px));
+ px+=(Rt-Lf)*dt*(.55+sp/190);px-=curve(pz)*sp/270*dt*.18;if(Math.abs(px)>1)px-=Math.sign(px)*dt*1.1;px=Math.max(-1.3,Math.min(1.3,px));
  camx=px;
  pl+=((Rt-Lf)-pl)*Math.min(1,dt*8);
  pos+=sp*dt;pa-=dt;cool-=dt;inv-=dt;
@@ -288,7 +288,7 @@ const fmt=ms=>ms>0?(ms/1000).toFixed(2)+'s':'DNF',esc=s=>String(s).replace(/[&<>
 const send=o=>{if(ws&&ws.readyState==1)ws.send(JSON.stringify(o))};
 function tagN(n,X,y,u){g.font='700 '+Math.max(10,15*u)+'px system-ui';g.textAlign='center';g.textBaseline='bottom';tx(n,X,y)}
 function reset(){reset0();if(MP)ents=ents.filter(e=>!e.r);for(const e of ents)if(e.r)e.base*=AI}
-function begin(){au();reset();if(eg&&!mute)eg.gain.value=.03;S='play';rt=0;CD=3;cdn=9}
+function begin(){au();clrK();reset();if(eg&&!mute)eg.gain.value=.03;S='play';rt=0;CD=3;cdn=9}
 function launch(){res=null;hideUI();begin()}
 /* ---- rooms ---- */
 function leave(){if(ws){const w=ws;ws=null;try{w.close()}catch(e){}}lobby=null;rem={};MP=0;res=null}
@@ -357,6 +357,11 @@ function act(a,v){const nm=$('nm');if(nm){const n=nm.value.trim().replace(/[^\w 
  else if(a=='leave'){leave();view='mp'}
  if(U.style.display!='none'&&a!='go')showUI()}
 showUI('main');
+/* stuck-input guards: never let a missed key/touch release keep steering */
+const TK=['ArrowLeft','ArrowRight','ArrowDown','Nit'],clrK=()=>{for(const c in k)k[c]=0};
+addEventListener('blur',clrK);document.addEventListener('visibilitychange',clrK);addEventListener('pagehide',clrK);addEventListener('contextmenu',clrK);
+for(const ev of['touchstart','touchmove','touchend','touchcancel'])addEventListener(ev,e=>{if(!e.touches.length)for(const c of TK)k[c]=0},{passive:true,capture:true});
+addEventListener('pointercancel',()=>{for(const c of TK)k[c]=0});
 
 let lt=performance.now();
 (function f(n){const dt=Math.min(.05,(n-lt)/1000);lt=n;if(!paused)upd(dt);draw();requestAnimationFrame(f)})(lt);
