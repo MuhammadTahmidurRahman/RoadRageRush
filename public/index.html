@@ -40,11 +40,16 @@ background:radial-gradient(circle,#120a24 0 7%,#ffd60a 8% 27%,transparent 28%),c
 #skip{width:clamp(34px,min(9vw,10vh),42px);height:clamp(34px,min(9vw,10vh),42px);padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 45%),linear-gradient(160deg,#6b7280,#1f2937);box-shadow:0 5px 14px rgba(0,0,0,.5);transition:transform .06s,filter .06s}
 #skip:active{transform:scale(.9);filter:brightness(1.3)}
 #skip svg{width:46%;height:46%}
+.col.rw{flex-direction:row;align-items:flex-end;gap:10px}
+.b[data-h]{--s:clamp(54px,min(17vw,22vh),84px)}
+#tips{position:fixed;left:50%;top:44%;transform:translateX(-50%);z-index:6;pointer-events:none;display:none;opacity:0;transition:opacity .6s;width:max-content;max-width:92vw;box-sizing:border-box;padding:8px 12px;border-radius:12px;background:rgba(10,5,30,.66);border:1px solid #fff3;color:#fff;font:600 clamp(11px,3vw,13px)/1.5 system-ui;text-align:left;text-shadow:0 1px 3px #000a}
+#tips b{color:#ffd60a}
 @media (max-height:520px){#ui{padding:6px 76px}}
 </style></head><body>
 <canvas id="c"></canvas><div id="sa" style="position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)"></div>
-<div id="tc"><div class="col"><button class="b br" data-k="ArrowDown">BRAKE</button></div>
-<div class="col"><button class="b" id="nit" data-k="Nit"><svg viewBox="0 0 24 28"><path d="M12 1c1 6 8 9 8 17a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 4 3 5-1-6-1-10 1-14z" fill="#ffd54a"/><path d="M12 12c1 4 4 5 4 9a4 4 0 0 1-8 0c0-3 2-4 4-9z" fill="#ff5a1f"/></svg><span>NITRO</span></button></div></div>
+<div id="tc"><div class="col rw"><button class="b" data-h="-1"><i>&#128074;</i>PUNCH</button><button class="b br" data-k="ArrowDown">BRAKE</button></div>
+<div class="col rw"><button class="b" id="nit" data-k="Nit"><svg viewBox="0 0 24 28"><path d="M12 1c1 6 8 9 8 17a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 4 3 5-1-6-1-10 1-14z" fill="#ffd54a"/><path d="M12 12c1 4 4 5 4 9a4 4 0 0 1-8 0c0-3 2-4 4-9z" fill="#ff5a1f"/></svg><span>NITRO</span></button><button class="b" data-h="1"><i>&#128074;</i>PUNCH</button></div></div>
+<div id="tips"><div><b>TILT</b> phone (or hold screen sides) = steer</div><div><b>&#128074; PUNCH</b> (or swipe) = hit riders for points</div><div><b>NITRO</b> = speed boost &nbsp; <b>BRAKE</b> = slow down</div></div>
 <div id="mus"><div id="disc" title="Play / pause"><div class="vin"></div><div id="ytw"></div></div><button id="skip" aria-label="Next track"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 4 16 12 8 20"/></svg></button></div>
 <script>
 const C=document.getElementById('c'),g=C.getContext('2d',{alpha:false});
@@ -182,7 +187,7 @@ function sv(){if(score>best){best=score|0;try{localStorage.setItem('rrr',best)}c
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&S=='play'&&!MP)paused=1});
 function reset0(){pos=0;sp=0;px=camx=0;hp=100;nit=100;zlast=-1;ko=0;score=ds=0;pa=0;cool=0;inv=0;pts=[];pops=[];ents=[];
  for(let i=0;i<7;i++)ents.push({r:1,x:[-.5,0,.5][i%3],z:PZ+70+i*75,base:(205+R()*35)*SPD,v:200*SPD,hp:60,col:RC[i],jc:JC[i],cd:1,crash:0,tx:0,spin:0,lane:[-.5,0,.5][i%3],pa:0,ps:1,t:0});
- for(let i=0;i<6;i++){const l=[-.6,-.2,.25,.6][i%4];ents.push({r:0,x:l,z:300+i*260,base:(90+R()*30)*SPD,v:100*SPD,col:TC[i%4],crash:0,spin:0,lane:l,cs:1})}}
+ for(let i=0;i<3;i++){const l=[-.6,-.2,.25,.6][i%4];ents.push({r:0,x:l,z:550+i*650,base:(90+R()*30)*SPD,v:100*SPD,col:TC[i%4],crash:0,spin:0,lane:l,cs:1})}}
 function start(){au();if(S=='play'){paused=0;return}showUI()}
 function pop(t,c){pops.push({t,c,l:1.1})}
 function spark(n,c){for(let i=0;i<n;i++)pts.push({x:W/2+(R()-.5)*60,y:H*.72,vx:(R()-.5)*260,vy:-R()*220,l:.5,c})}
@@ -229,11 +234,11 @@ function upd(dt){
  const zn=ZN(pos+PZ);if(zn!==zlast){if(zlast>=0)pop('Entering '+['the village','farmland','the city','the forest'][zn],'#7dd3fc');zlast=zn}bgx+=curve(pz)*sp*dt*.1;
  score+=sp*dt*.04;
  if(off){hp-=6*dt*(1-UP.a*.12);px+=(R()-.5)*.05;sh=Math.max(sh,5);if(R()<.5)pts.push({x:W/2+(R()-.5)*40,y:H*.74,vx:(R()-.5)*80,vy:-R()*60,l:.4,c:'#a98'})}
- for(const b of OB){const dz=b.z-pz;if(dz>12)break;if(dz<-10)continue;if(Math.abs(b.x-px)<b.w&&inv<=0){hp-=b.d*(1-UP.a*.12);inv=1;sp*=.4;px+=(px>=b.x?1:-1)*.3;sh=14;beep(2);spark(18,'#f84');pop('Crash!','#f55')}}
+ for(const b of OB){const dz=b.z-pz;if(dz>12)break;if(dz<-10)continue;if(Math.abs(b.x-px)<b.w&&inv<=0){hp-=b.d*(1-UP.a*.12);inv=1.5;sp*=.5;px+=(px>=b.x?1:-1)*.3;sh=14;beep(2);spark(18,'#f84');pop('Crash!','#f55')}}
  for(const e of ents){
   const dz=e.z-pz,dx=e.x-px;
   if(e.crash>0){e.crash-=dt;e.x+=e.cs*dt*.9;e.z+=e.v*dt*.3;e.v*=.97;e.spin+=dt*9*e.cs;
-   if(e.crash<=0){e.spin=0;e.v=e.base;e.x=e.lane;if(e.r){e.hp=60;e.z=pz-130-R()*100}else e.z=pz+1500+R()*500}continue}
+   if(e.crash<=0){e.spin=0;e.v=e.base;e.x=e.lane;if(e.r){e.hp=60;e.z=pz-130-R()*100}else e.z=pz+1900+R()*1300}continue}
   if(e.r){
    e.t-=dt;if(e.t<=0){e.t=1.5+R()*2;e.tx=Math.abs(dz)<150?px+(e.x>px?.32:-.32):(R()*1.4-.7)}
    {const dg=!clear(e.x,e.z)||!clear(e.tx,e.z);if(dg)e.tx=dodge(e,e.x);e.x+=(e.tx-e.x)*dt*(dg?4:1.5)}e.x=Math.max(-.85,Math.min(.85,e.x));
@@ -243,8 +248,8 @@ function upd(dt){
      if(inv<=0){hp-=7*(1-UP.a*.12);px+=(dx>0?-1:1)*.1;sp=Math.max(0,sp-12);sh=7;beep(2);spark(6,'#f55')}}}
    if(Math.abs(dz)<12&&Math.abs(dx)<.12){e.x+=(dx>=0?1:-1)*.05;px-=(dx>=0?1:-1)*.05}
   }else{
-   if(dz<-80){e.z=pz+1500+R()*500;e.x=e.lane}e.x+=(dodge(e,e.lane)-e.x)*Math.min(1,dt*3);
-   if(Math.abs(dz)<10&&Math.abs(dx)<.3/WS&&inv<=0){hp-=14*(1-UP.a*.12);inv=1;sp*=.35;px+=dx>0?-.35:.35;sh=14;beep(2);e.z+=40;spark(18,'#f84');pop('Crash!','#f55')}
+   if(dz<-80){e.z=pz+1900+R()*1300;e.x=e.lane}e.x+=(dodge(e,e.lane)-e.x)*Math.min(1,dt*3);
+   if(Math.abs(dz)<10&&Math.abs(dx)<.3/WS&&inv<=0){hp-=10*(1-UP.a*.12);inv=1.5;sp*=.4;px+=dx>0?-.35:.35;sh=14;beep(2);e.z+=40;spark(18,'#f84');pop('Crash!','#f55')}
   }
   e.z+=e.v*dt}
  if(eo)eo.frequency.value=45+sp*.45;
@@ -441,7 +446,7 @@ function showUI(v){if(v)view=v;U.style.display='block';
   Object.keys(UPN).map(k=>{const L=UP[k],c=UPN[k][1]*(L+1);return L>=5?`<p>${UPN[k][0]}: MAX</p>`:B('buy',`${UPN[k][0]} L${L} &rarr; L${L+1} ($${c})`,k)}).join('')+B('career','START STAGE')+B('view','Back','main')}
  else if(view=='lb')h='<h3>Global leaderboard</h3><p>Fastest finish times</p><div id=lb>Loading...</div>'+B('view','Back','main');
  else if(view=='mp')h=`<h3>Multiplayer &middot; up to 10 riders</h3>${nb}<input id=rc maxlength=6 placeholder="ROOM CODE" style="text-transform:uppercase">`+B('join','Join room')+B('create','Create new room')+B('view','Back','main');
- else h=`<h3>Pick a mode</h3>${nb}`+'<div class=grid>'+B('quick','Quick Race')+B('view','Career','career')+B('view','Multiplayer','mp')+B('view','Leaderboard','lb')+B('radio','Music: '+(radioOn?'ON':'OFF'))+B('rnext','Next track')+(TOUCH?B('tilt','Tilt steering: '+(PF.tilt===0?'OFF':'ON'))+B('tinv','Tilt direction: '+(PF.inv?'REVERSED':'NORMAL')):'')+'</div>'+'<p class=hint>'+(TOUCH?'Tilt phone to steer &middot; swipe left/right to punch &middot; if tilt is unavailable, hold the left/right side of the screen to steer':'A-D to steer &middot; Q/E punch &middot; Shift nitro &middot; S brake &middot; R next track')+'</p><p class=hint id=rn>'+esc(musicLine())+'</p>';
+ else h=`<h3>Pick a mode</h3>${nb}`+'<div class=grid>'+B('quick','Quick Race')+B('view','Career','career')+B('view','Multiplayer','mp')+B('view','Leaderboard','lb')+B('radio','Music: '+(radioOn?'ON':'OFF'))+B('rnext','Next track')+(TOUCH?B('tilt','Tilt steering: '+(PF.tilt===0?'OFF':'ON'))+B('tinv','Tilt direction: '+(PF.inv?'REVERSED':'NORMAL')):'')+'</div>'+'<p class=hint>'+(TOUCH?'Tilt phone to steer &middot; PUNCH buttons (or swipe left/right) to punch &middot; NITRO to boost &middot; if tilt is unavailable, hold the left/right side of the screen to steer':'A-D to steer &middot; Q/E punch &middot; Shift nitro &middot; S brake &middot; R next track')+'</p><p class=hint id=rn>'+esc(musicLine())+'</p>';
  U.innerHTML=`<div class=card>${h}${err?`<p class=err>${esc(err)}</p>`:''}</div>`;
  if(!res&&!(MP&&lobby)&&view=='lb')loadLB()}
 U.onclick=e=>{const b=e.target.closest('button');if(b)act(b.dataset.a,b.dataset.v)};
@@ -468,8 +473,8 @@ addEventListener('pointercancel',()=>{for(const c of TK)k[c]=0});
 /* ---- road obstacles: same layout for every player (seeded), always a clear corridor ---- */
 const TY=[['cone',18,6],['barrel',22,9],['crate',34,11],['barrier',58,16]],OB=[];
 (()=>{let a=1337;const r=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};let gc=0;
- for(let z=900;z<L-700;z+=(250+r()*170)|0){gc=Math.max(-.4,Math.min(.4,gc+(r()-.5)*.8));const gh=.46+r()*.1,sd=[r()<.85,r()<.85];if(!sd[0]&&!sd[1])sd[r()<.5?0:1]=true;
-  [-1,1].forEach((q,i)=>{if(!sd[i])return;let edge=gc+q*gh;for(let n=r()<.5?2:1;n>0;n--){const t=TY[r()*4|0],w=(t[1]/270+.11)/WS,x=edge+q*w;if(Math.abs(x)>.97)break;OB.push({z,x,w,t:t[0],d:t[2]});edge=x+q*(w+.02)}})}})();
+ for(let z=900;z<L-700;z+=(340+r()*220)|0){gc=Math.max(-.4,Math.min(.4,gc+(r()-.5)*.8));const gh=.46+r()*.1,sd=[r()<.75,r()<.75];if(!sd[0]&&!sd[1])sd[r()<.5?0:1]=true;
+  [-1,1].forEach((q,i)=>{if(!sd[i])return;let edge=gc+q*gh;for(let n=r()<.3?2:1;n>0;n--){const t=TY[r()*4|0],w=(t[1]/270+.11)/WS,x=edge+q*w;if(Math.abs(x)>.97)break;OB.push({z,x,w,t:t[0],d:t[2]});edge=x+q*(w+.02)}})}})();
 const OS={cone:[50,60,x=>{x.fillStyle='#c2410c';x.fillRect(-18,-7,36,7);x.fillStyle='#ff7a1a';x.beginPath();x.moveTo(-13,-7);x.lineTo(0,-56);x.lineTo(13,-7);x.fill();x.fillStyle='#fff';x.fillRect(-8,-32,16,6);x.fillRect(-11,-18,22,5)}],
  barrel:[56,80,x=>{x.fillStyle='#b91c1c';x.beginPath();x.roundRect(-22,-66,44,66,6);x.fill();x.fillStyle='#450a0a';x.fillRect(-22,-50,44,5);x.fillRect(-22,-22,44,5);x.fillStyle='#ef4444';x.fillRect(-18,-64,8,60);x.fillStyle='#7f1d1d';x.beginPath();x.ellipse(0,-66,22,6,0,0,7);x.fill()}],
  crate:[84,84,x=>{x.fillStyle='#a0692f';x.fillRect(-34,-64,68,64);x.strokeStyle='#5b3a17';x.lineWidth=5;x.strokeRect(-32,-62,64,60);x.beginPath();x.moveTo(-32,-62);x.lineTo(32,-2);x.moveTo(32,-62);x.lineTo(-32,-2);x.stroke();x.fillStyle='rgba(255,255,255,.18)';x.fillRect(-34,-64,68,8)}],
@@ -478,7 +483,8 @@ function osp(t){const d=OS[t];return[mk2('o'+t,d[0],d[1],x=>{x.fillStyle='rgba(0
 const clear=(x,z)=>!OB.some(b=>b.z>z-14&&b.z<z+170&&Math.abs(b.x-x)<b.w+.17);
 const dodge=(e,ref)=>{if(clear(ref,e.z))return ref;for(let d=.1;d<1.8;d+=.1)for(const q of[1,-1]){const t=ref+q*d;if(Math.abs(t)<=.85&&clear(t,e.z))return t}return ref};
 
-const NB=$('nit');let lN=-1,lB=-1;function nh(){const n=nit|0;if(n!==lN){lN=n;NB.style.setProperty('--n',n)}if(BST!==lB){lB=BST;NB.classList.toggle('on',!!BST)}}
+const TP=$('tips');if(TOUCH)TP.style.display='block';let lTp=-1;function tipsSync(){const v=TOUCH&&S=='play'&&rt<8?1:0;if(v!==lTp){lTp=v;TP.style.opacity=v}}
+const NB=$('nit');let lN=-1,lB=-1;function nh(){const n=nit|0;if(n!==lN){lN=n;NB.style.setProperty('--n',n)}if(BST!==lB){lB=BST;NB.classList.toggle('on',!!BST)}tipsSync()}
 let lt=performance.now();
 (function f(n){const dt=Math.min(.05,(n-lt)/1000);lt=n;if(!paused)upd(dt);draw();nh();requestAnimationFrame(f)})(lt);
 ytLoad();reset();
