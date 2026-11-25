@@ -12,7 +12,6 @@ canvas{position:fixed;inset:0;display:block;width:100vw;height:100vh;height:100d
 .b[data-h="-1"] i{display:inline-block;transform:scaleX(-1)}
 .b:active{transform:scale(.9);filter:brightness(1.3)}
 .b.br{--s:clamp(44px,min(13vw,16vh),60px);background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.3),rgba(255,255,255,0) 45%),linear-gradient(160deg,#6b7280,#1f2937);font-size:clamp(8px,2.2vw,10px)}
-#pn{--s:clamp(80px,min(25vw,31vh),120px)}
 #nit{--s:clamp(70px,min(22vw,27vh),106px);--n:100;border:0;background:conic-gradient(#38e8ff calc(var(--n)*1%),rgba(255,255,255,.18) 0);box-shadow:0 0 16px rgba(56,200,255,.55),0 6px 16px rgba(0,0,0,.5)}
 #nit::before{content:"";position:absolute;inset:6px;border-radius:50%;background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.5),rgba(255,255,255,0) 42%),linear-gradient(160deg,#1ec8ff,#5b2bff 62%,#1b0f6b);box-shadow:inset 0 -8px 14px rgba(0,0,0,.45),inset 0 2px 4px rgba(255,255,255,.55)}
 #nit>*{position:relative}#nit svg{width:36%;height:auto;filter:drop-shadow(0 0 6px #ffb02e)}
@@ -29,7 +28,7 @@ canvas{position:fixed;inset:0;display:block;width:100vw;height:100vh;height:100d
 </style></head><body>
 <canvas id="c"></canvas><div id="sa" style="position:fixed;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)"></div>
 <div id="tc"><div class="col"><button class="b br" data-k="ArrowDown">BRAKE</button></div>
-<div class="col"><button class="b" id="nit" data-k="Nit"><svg viewBox="0 0 24 28"><path d="M12 1c1 6 8 9 8 17a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 4 3 5-1-6-1-10 1-14z" fill="#ffd54a"/><path d="M12 12c1 4 4 5 4 9a4 4 0 0 1-8 0c0-3 2-4 4-9z" fill="#ff5a1f"/></svg><span>NITRO</span></button><button class="b" id="pn" data-h="0"><i>&#129354;</i>PUNCH</button></div></div>
+<div class="col"><button class="b" id="nit" data-k="Nit"><svg viewBox="0 0 24 28"><path d="M12 1c1 6 8 9 8 17a8 8 0 0 1-16 0c0-4 2-6 4-8 0 3 1 4 3 5-1-6-1-10 1-14z" fill="#ffd54a"/><path d="M12 12c1 4 4 5 4 9a4 4 0 0 1-8 0c0-3 2-4 4-9z" fill="#ff5a1f"/></svg><span>NITRO</span></button></div></div>
 <script>
 const C=document.getElementById('c'),g=C.getContext('2d',{alpha:false});
 let W,H,hy,cx=[],rw=[],skyG,hzG,vig,sunG,nvG,UK=1,SA={t:0,r:0,b:0,l:0};
@@ -45,7 +44,7 @@ const R=Math.random,k={},L=18000,PZ=26;
 const curve=z=>0;
 let S='title',pos=0,sp=0,px=0,camx=0,hp=100,ko=0,score=0,ds=0,pa=0,ps=1,cool=0,inv=0,sh=0,bgx=0,pl=0,ents=[],msg='',pts=[],pops=[];
 let ac,eo,eg,mute=0,nit=100,zlast=-1,best=0,paused=0;try{best=+localStorage.getItem('rrr')||0}catch(e){}
-function au(){if(ac)return;ac=new(window.AudioContext||window.webkitAudioContext)();eo=ac.createOscillator();eg=ac.createGain();eo.type='sawtooth';eg.gain.value=.03;eo.connect(eg).connect(ac.destination);eo.start()}
+function au(){musicKick();if(ac)return;ac=new(window.AudioContext||window.webkitAudioContext)();eo=ac.createOscillator();eg=ac.createGain();eo.type='sawtooth';eg.gain.value=.03;eo.connect(eg).connect(ac.destination);eo.start()}
 function beep(f){if(navigator.vibrate&&TOUCH)navigator.vibrate(f==1?12:35);if(!ac||mute)return;const t=ac.currentTime,o=ac.createOscillator(),v=ac.createGain();o.type='square';o.frequency.setValueAtTime(f==1?300:120,t);o.frequency.exponentialRampToValueAtTime(40,t+.15);v.gain.setValueAtTime(.1,t);v.gain.exponentialRampToValueAtTime(.001,t+.15);o.connect(v).connect(ac.destination);o.start();o.stop(t+.16)}
 const RC=['#e63946','#f4a261','#2a9d8f','#e9c46a','#9b5de5','#00bbf9','#f15bb5'],JC=['#1d3557','#f1faee','#6a040f','#264653','#222','#7b2cbf','#0b525b'],TC=['#4361ee','#ced4da','#fb8500','#8ac926'];
 /* cached sprites: drawn once, then stamped */
@@ -179,12 +178,13 @@ function hit(s){if(cool>0||S!='play'||CD>0)return;if(!s)s=aim();pa=.28;ps=s;cool
 addEventListener('keydown',e=>{if(e.target.tagName=='INPUT')return;k[e.code]=1;if(e.code=='Enter'||e.code=='Space')start();
  if(e.code=='KeyQ')hit(-1);if(e.code=='KeyE')hit(1);
  if(e.code=='KeyP'||e.code=='Escape'){if(S=='play'&&!MP)paused=!paused}
- if(e.code=='KeyM'){mute=!mute;if(eg)eg.gain.value=mute?0:.03}
+ if(e.code=='KeyM'){mute=!mute;if(eg)eg.gain.value=mute?0:.03;if(RA)RA.muted=!!mute;if(YR){if(mute)YP.mute();else YP.unMute()}}
+ if(e.code=='KeyR')musicNext();
  if(e.code.startsWith('Arrow')||e.code=='Space')e.preventDefault()});
 addEventListener('keyup',e=>k[e.code]=0);
-let TS=0,BST=0,sid=-1,sa=0;const SR=34;
-C.addEventListener('pointerdown',e=>{if(e.pointerType=='mouse'||sid>=0)return;sid=e.pointerId;sa=e.clientX;TS=0;try{C.setPointerCapture(sid)}catch(_){}});
-C.addEventListener('pointermove',e=>{if(e.pointerId!=sid)return;let d=e.clientX-sa;if(d>SR){sa=e.clientX-SR;d=SR}else if(d<-SR){sa=e.clientX+SR;d=-SR}TS=d/SR});
+let TS=0,BST=0,sid=-1,sa=0;const SW=26;
+C.addEventListener('pointerdown',e=>{if(e.pointerType=='mouse'||sid>=0)return;sid=e.pointerId;sa=e.clientX;TS=(tiltLive&&PF.tilt!==0)?0:(e.clientX<innerWidth/2?-1:1);try{C.setPointerCapture(sid)}catch(_){}});
+C.addEventListener('pointermove',e=>{if(e.pointerId!=sid)return;const d=e.clientX-sa;if(Math.abs(d)>SW){sa=e.clientX;TS=0;hit(d>0?1:-1)}});
 const se=e=>{if(e.pointerId==sid){sid=-1;TS=0}};C.addEventListener('pointerup',se);C.addEventListener('pointercancel',se);
 C.addEventListener('pointerdown',start);
 if('ontouchstart'in window||navigator.maxTouchPoints>0)document.getElementById('tc').style.display='flex';
@@ -199,7 +199,7 @@ function upd(dt){
  ds+=(score-ds)*Math.min(1,dt*9);
  if(S=='title'){pos+=60*dt;bgx+=curve(pz)*60*dt*.1;return}
  if(S!='play'){BST=0;return}if(CD>0){CD-=dt;const n=Math.ceil(CD);if(n!=cdn){cdn=n;pop(n>0?''+n:'GO!',n>0?'#fff':'#4ade80')}if(CD>0)return}rt+=dt;mpTick(dt);
- const Lf=k.ArrowLeft||k.KeyA?1:0,Rt=k.ArrowRight||k.KeyD?1:0,br=k.ArrowDown||k.KeyS,ST2=Math.max(-1,Math.min(1,Rt-Lf+TS));
+ const Lf=k.ArrowLeft||k.KeyA?1:0,Rt=k.ArrowRight||k.KeyD?1:0,br=k.ArrowDown||k.KeyS,ST2=Math.max(-1,Math.min(1,Rt-Lf+TS+tiltSteer(dt)));
  const off=Math.abs(px)>1;
  const bst=(k.ShiftLeft||k.ShiftRight||k.KeyN||k.Nit)&&nit>2&&!br&&!off;nit=bst?nit-(34-UP.n*3)*dt:Math.min(100,nit+(9+UP.n*2)*dt);
  BST=bst?1:0;if(bst){sp+=150*dt;if(R()<.8)pts.push({x:W/2+(R()-.5)*14,y:hy+(H-hy)*.76,vx:(R()-.5)*60,vy:70,l:.3,c:R()<.5?'#ff9a2e':'#fff1a8'})}
@@ -312,6 +312,61 @@ function tagN(n,X,y,u){g.font='700 '+Math.max(10,15*u)+'px system-ui';g.textAlig
 function reset(){reset0();if(MP)ents=ents.filter(e=>!e.r);for(const e of ents)if(e.r)e.base*=AI}
 function begin(){au();clrK();reset();if(eg&&!mute)eg.gain.value=.03;S='play';rt=0;CD=3;cdn=9}
 function launch(){res=null;hideUI();begin()}
+/* ---- FM radio: live Bangladeshi stations (radio-browser.info directory) ---- */
+let RA=null,RL=[],RI=0,radioOn=1,radioName='',rf=0;
+const RH=['de1','de2','fi1','nl1'].map(s=>'https://'+s+'.api.radio-browser.info'),RBAD=/news|betar|quran|islam|tilawat|azan|talk|waz/i;
+async function radioLoad(){const q='/json/stations/search?countrycode=BD&hidebroken=true&order=clickcount&reverse=true&limit=80';
+ for(const h of RH){try{const r=await fetch(h+q);if(!r.ok)continue;const d=await r.json(),seen={},l=[];
+  for(const s of d){const u=s.url_resolved,n=(s.name||'').trim(),kk=n.toLowerCase();if(!u||+s.hls||!/^https:/.test(u)||RBAD.test(n+' '+(s.tags||''))||seen[kk])continue;seen[kk]=1;l.push({n,u})}
+  if(l.length)return l}catch(e){}}return[]}
+function radioSet(){const el=$('rn');if(el)el.textContent=musicLine()}
+function radioPlay(i){if(!RA||!RL.length)return;RI=(i+RL.length)%RL.length;const s=RL[RI];radioName=s.n;RA.src=s.u;radioSet();if(radioOn)RA.play().catch(()=>{});pop('FM: '+s.n,'#7dd3fc')}
+function radioNext(){if(!RA||!RL.length)return;radioOn=1;rf=0;radioPlay(RI+1)}
+async function radioStart(){if(RA)return;RA=new Audio();RA.volume=.5;RA.muted=!!mute;
+ RA.addEventListener('error',()=>{if(radioOn&&++rf<=RL.length)radioPlay(RI+1)});
+ RA.addEventListener('playing',()=>{rf=0});
+ RL=await radioLoad();if(!RL.length){radioName='unavailable';radioSet();return}
+ radioPlay(0)}
+function radioKick(){if(!RA)radioStart();else if(radioOn&&RA.paused&&RA.getAttribute('src'))RA.play().catch(()=>{})}
+function radioToggle(){radioOn=!radioOn;if(!RA){if(radioOn)radioKick();return}if(radioOn)radioKick();else RA.pause();radioSet()}
+document.addEventListener('visibilitychange',()=>{if(!RA)return;if(document.hidden)RA.pause();else radioKick()});
+/* ---- YouTube playlist music (falls back to FM radio) ---- */
+const YL='PLYXbCWnyBcpLJjqRADm9iumMeYfWFlueh';
+let YP=null,YR=0,ymode=1,yErr=0,yTitle='',yBox=null;
+const musicLine=()=>!radioOn?'Music off':ymode?(yTitle?'♪ '+yTitle:'YouTube playlist loading...'):'FM: '+(radioName||'loading...');
+function ytLoad(){if(yBox)return;
+ yBox=document.createElement('div');yBox.style.cssText='position:fixed;left:8px;bottom:'+(TOUCH?'84px':'8px')+';width:200px;height:200px;z-index:4;border-radius:12px;overflow:hidden;background:#000;box-shadow:0 4px 18px #000a;opacity:.6;pointer-events:none';
+ yBox.innerHTML='<div id=ytp></div>';document.body.appendChild(yBox);
+ window.onYouTubeIframeAPIReady=ytInit;
+ const t=document.createElement('script');t.src='https://www.youtube.com/iframe_api';t.onerror=ytFall;document.head.appendChild(t);
+ setTimeout(()=>{if(ymode&&!YR)ytFall()},12000)}
+function ytInit(){if(YP||!ymode)return;
+ try{YP=new YT.Player('ytp',{width:200,height:200,playerVars:{listType:'playlist',list:YL,controls:0,playsinline:1,rel:0,modestbranding:1,disablekb:1,fs:0,iv_load_policy:3},events:{
+  onReady:()=>{YR=1;YP.setVolume(70);if(mute)YP.mute();ytSetup(0);setInterval(ytWatch,500)},
+  onStateChange:e=>{if(e.data==1){yErr=0;try{const t=(YP.getVideoData().title||'').slice(0,30);if(t&&t!=yTitle){yTitle=t;pop('♪ '+t,'#7dd3fc');radioSet()}}catch(_){}}},
+  onError:()=>{if(++yErr>=6)ytFall();else try{YP.nextVideo()}catch(_){ytFall()}}}})}catch(_){ytFall()}}
+function ytSetup(n){if(!YP||!ymode)return;let l=[];try{l=YP.getPlaylist()||[]}catch(_){}
+ if(l.length){try{YP.setLoop(true);YP.setShuffle(true);if(radioOn)YP.playVideoAt(R()*l.length|0)}catch(_){}}
+ else if(n<20)setTimeout(()=>ytSetup(n+1),500);else ytFall()}
+function ytFall(){if(!ymode)return;ymode=0;YR=0;try{if(YP)YP.destroy()}catch(_){}YP=null;if(yBox)yBox.style.display='none';pop('Playlist unavailable, FM radio on','#f87171');radioSet();radioKick()}
+function ytWatch(){if(!yBox||!YR||!YP)return;let st=-1;try{st=YP.getPlayerState()}catch(_){}const pl=st==1||st==3;
+ yBox.style.pointerEvents=(radioOn&&!pl&&S!='play')?'auto':'none';yBox.style.opacity=(S=='play'&&pl)?'.5':'1'}
+function musicKick(){if(ymode){if(!yBox)ytLoad();else if(YR&&radioOn){let s=-1;try{s=YP.getPlayerState()}catch(_){}if(s!=1&&s!=3)try{YP.playVideo()}catch(_){}}}else radioKick()}
+function musicNext(){if(ymode){radioOn=1;if(YR){try{YP.nextVideo();YP.playVideo()}catch(_){}}else musicKick();radioSet()}else radioNext()}
+function musicToggle(){radioOn=!radioOn;
+ if(ymode){if(YR){try{if(radioOn)YP.playVideo();else YP.pauseVideo()}catch(_){}}else if(radioOn)musicKick()}
+ else if(!RA){if(radioOn)radioKick()}else if(radioOn)radioKick();else RA.pause();
+ radioSet()}
+document.addEventListener('visibilitychange',()=>{if(!YR||!YP)return;try{if(document.hidden)YP.pauseVideo();else if(radioOn)YP.playVideo()}catch(_){}});
+/* ---- tilt steering (touch devices) ---- */
+let tiltLive=0,tiltV=0,tiltBase=null,TT=0,tiltHook=0,tiltAsked=0;const TILT_DZ=3,TILT_MAX=18;
+const oriAng=()=>{const a=screen.orientation&&screen.orientation.angle!=null?screen.orientation.angle:(window.orientation||0);return((a%360)+360)%360};
+function onTilt(e){if(e.beta==null||e.gamma==null)return;const a=oriAng(),v=a==90?e.beta:a==270?-e.beta:a==180?-e.gamma:e.gamma;tiltV=v;tiltLive=1;if(tiltBase==null||S!='play'||CD>0)tiltBase=v}
+function tiltAsk(){if(!TOUCH||PF.tilt===0||tiltHook||tiltAsked)return;tiltAsked=1;const D=window.DeviceOrientationEvent,go=()=>{tiltHook=1;addEventListener('deviceorientation',onTilt,true)};
+ if(D&&typeof D.requestPermission=='function')D.requestPermission().then(r=>{if(r=='granted')go();else tiltAsked=0}).catch(()=>{tiltAsked=0});else if(D)go()}
+function tiltSteer(dt){let t=0;if(tiltLive&&PF.tilt!==0&&tiltBase!=null){let d=tiltV-tiltBase;if(d>180)d-=360;else if(d<-180)d+=360;if(PF.inv)d=-d;const a=Math.abs(d);t=a<TILT_DZ?0:Math.min(1,(a-TILT_DZ)/(TILT_MAX-TILT_DZ))*Math.sign(d)}
+ TT+=(t-TT)*Math.min(1,dt*14);return TT}
+const tiltReset=()=>{tiltBase=null};addEventListener('orientationchange',tiltReset);if(screen.orientation&&screen.orientation.addEventListener)screen.orientation.addEventListener('change',tiltReset);
 /* ---- rooms ---- */
 function leave(){if(ws){const w=ws;ws=null;try{w.close()}catch(e){}}lobby=null;rem={};MP=0;res=null}
 function join(code){leave();code=(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);if(!code){err='Enter a room code';return showUI()}
@@ -363,11 +418,11 @@ function showUI(v){if(v)view=v;U.style.display='block';
   Object.keys(UPN).map(k=>{const L=UP[k],c=UPN[k][1]*(L+1);return L>=5?`<p>${UPN[k][0]}: MAX</p>`:B('buy',`${UPN[k][0]} L${L} &rarr; L${L+1} ($${c})`,k)}).join('')+B('career','START STAGE')+B('view','Back','main')}
  else if(view=='lb')h='<h3>Global leaderboard</h3><p>Fastest finish times</p><div id=lb>Loading...</div>'+B('view','Back','main');
  else if(view=='mp')h=`<h3>Multiplayer &middot; up to 10 riders</h3>${nb}<input id=rc maxlength=6 placeholder="ROOM CODE" style="text-transform:uppercase">`+B('join','Join room')+B('create','Create new room')+B('view','Back','main');
- else h=`<h3>Pick a mode</h3>${nb}`+'<div class=grid>'+B('quick','Quick Race')+B('view','Career','career')+B('view','Multiplayer','mp')+B('view','Leaderboard','lb')+'</div>'+'<p class=hint>Slide finger or A-D to steer &middot; Q/E punch &middot; Shift nitro &middot; S brake</p>';
+ else h=`<h3>Pick a mode</h3>${nb}`+'<div class=grid>'+B('quick','Quick Race')+B('view','Career','career')+B('view','Multiplayer','mp')+B('view','Leaderboard','lb')+B('radio','Music: '+(radioOn?'ON':'OFF'))+B('rnext','Next track')+(TOUCH?B('tilt','Tilt steering: '+(PF.tilt===0?'OFF':'ON'))+B('tinv','Tilt direction: '+(PF.inv?'REVERSED':'NORMAL')):'')+'</div>'+'<p class=hint>'+(TOUCH?'Tilt phone to steer &middot; swipe left/right to punch &middot; if tilt is unavailable, hold the left/right side of the screen to steer':'A-D to steer &middot; Q/E punch &middot; Shift nitro &middot; S brake &middot; R next track')+'</p><p class=hint id=rn>'+esc(musicLine())+'</p>';
  U.innerHTML=`<div class=card>${h}${err?`<p class=err>${esc(err)}</p>`:''}</div>`;
  if(!res&&!(MP&&lobby)&&view=='lb')loadLB()}
 U.onclick=e=>{const b=e.target.closest('button');if(b)act(b.dataset.a,b.dataset.v)};
-function act(a,v){const nm=$('nm');if(nm){const n=nm.value.trim().replace(/[^\w \-]/g,'').slice(0,12);if(n){PF.name=n;SV()}}err='';
+function act(a,v){tiltAsk();const nm=$('nm');if(nm){const n=nm.value.trim().replace(/[^\w \-]/g,'').slice(0,12);if(n){PF.name=n;SV()}}err='';
  if(a=='view'){view=v;res=null}
  else if(a=='quick'){MODE='quick';MP=0;AI=1;launch()}
  else if(a=='career'){MODE='career';MP=0;AI=ST[PF.st][1];launch()}
@@ -375,6 +430,8 @@ function act(a,v){const nm=$('nm');if(nm){const n=nm.value.trim().replace(/[^\w 
  else if(a=='create')join(Array.from({length:4},()=>'ABCDEFGHJKMNPQRSTUVWXYZ'[R()*23|0]).join(''));
  else if(a=='join')join($('rc').value);
  else if(a=='go')send({t:'go'});
+ else if(a=='radio')musicToggle();else if(a=='tilt'){PF.tilt=PF.tilt===0?1:0;SV();tiltAsk()}else if(a=='tinv'){PF.inv=PF.inv?0:1;SV()}
+ else if(a=='rnext')musicNext();
  else if(a=='back')res=null;
  else if(a=='leave'){leave();view='mp'}
  if(U.style.display!='none'&&a!='go')showUI()}
